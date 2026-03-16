@@ -6,7 +6,7 @@ services:
     container_name: n8n
     restart: unless-stopped
     ports:
-      - "0.0.0.0:80:5678"
+      - "<YOUR_TAILSCALE_IP>:80:5678"
     environment:
       - N8N_SECURE_COOKIE=false
       - N8N_HOST=<YOUR_TAILSCALE_IP>

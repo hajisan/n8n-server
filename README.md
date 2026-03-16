@@ -11,7 +11,7 @@ Self-hosted [n8n](https://n8n.io) running on a DigitalOcean Droplet with multi-l
 ```
  Admin (Tailscale)     ──► Tailscale VPN        ──► n8n UI
  Webhooks (HTTPS)      ──► Cloudflare Tunnel     ──► n8n Webhooks
- Direct IP             ──► iptables DROP
+ Direct IP             ──► port not bound        ──► connection refused
 ```
 
 ---
@@ -22,7 +22,7 @@ Self-hosted [n8n](https://n8n.io) running on a DigitalOcean Droplet with multi-l
 |---|---|
 | Tailscale VPN | Zero-trust admin access – n8n UI only reachable from Tailscale network |
 | Cloudflare Tunnel | HTTPS webhook endpoint without exposed ports or a domain |
-| iptables | Blocks direct IP access to port 80 at RAW table + DOCKER-USER chain (handles Docker bypass of UFW) |
+| Docker port binding | n8n bound to Tailscale IP only (`<TAILSCALE_IP>:80:5678`) — Docker bypasses iptables/UFW entirely, so binding is the only reliable way to restrict access |
 | Fail2ban | Bans IPs after 3 failed SSH attempts for 1 hour |
 | SSH key-only | Password auth disabled |
 
@@ -39,7 +39,7 @@ services:
     container_name: n8n
     restart: unless-stopped
     ports:
-      - "0.0.0.0:80:5678"
+      - "<YOUR_TAILSCALE_IP>:80:5678"
     environment:
       - N8N_SECURE_COOKIE=false
       - N8N_HOST=<YOUR_TAILSCALE_IP>
